@@ -958,19 +958,10 @@ fun AppNavigation(
             }
             val hqFeedStore = remember { com.mibot.ui.hq.FeedStore(context).also { it.load() } }
             val hqPosts by hqFeedStore.posts.collectAsState()
-            com.mibot.ui.hq.HqShell(
-                botsContent = {
-                    com.mibot.ui.hq.HqBotsScreen(
-                        onOpenBot = {
-                            navController.safeNavigate(Routes.chat(java.util.UUID.randomUUID().toString()))
-                        },
-                    )
-                },
+            com.mibot.ui.claude.ClaudeUiPreviewScreen(
                 sessions = hqConvSummaries,
-                posts = hqPosts,
+                dao = chatRepository.dao,
                 onOpenSession = { id -> navController.safeNavigate(Routes.chat(id)) },
-                onDeleteSession = { },
-                onOpenUrl = { url -> android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url)).also { navController.context.startActivity(it) } },
                 onMoreEntry = { entry ->
                     when (entry.id) {
                         "settings" -> navController.safeNavigate(Routes.SETTINGS)
@@ -986,7 +977,6 @@ fun AppNavigation(
                         "calls" -> navController.safeNavigate(Routes.MIBOT_CALLS)
                         "dynamics" -> navController.safeNavigate(Routes.DYNAMICS)
                         "opencode" -> navController.safeNavigate(Routes.MIBOT_OPENCODE)
-                        "claude" -> navController.safeNavigate(Routes.CLAUDE_PREVIEW)
                         "voice" -> navController.safeNavigate(Routes.MIBOT_VOICE)
                         else -> {}
                     }
