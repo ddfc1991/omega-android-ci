@@ -54,6 +54,7 @@ fun ClaudeShell(
     onDeleteSession: (String) -> Unit = {},
     modifier: Modifier = Modifier,
     showSidebar: Boolean = true,
+    onMoreEntry: (com.mibot.ui.hq.HqMoreEntry) -> Unit = {},
 ) {
     androidx.compose.foundation.layout.BoxWithConstraints(
         modifier = modifier.fillMaxSize().background(Claude.bg),
@@ -61,6 +62,7 @@ fun ClaudeShell(
         // 手机(窄屏)全宽聊天:侧栏折叠成汉堡弹出;桌面(宽屏)才并排侧栏。
         val wide = maxWidth >= 600.dp
         val sidebarVisible = showSidebar && wide
+        var showMore by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
         if (sidebarVisible) {
             Row(Modifier.fillMaxSize()) {
                 ClaudeSidebar(
@@ -71,7 +73,7 @@ fun ClaudeShell(
                 )
                 DividerVLine(modifier = Modifier.fillMaxHeight())
                 Column(modifier = Modifier.weight(1f).fillMaxSize()) {
-                    ClaudeTopBar(modifier = Modifier.fillMaxWidth())
+                    ClaudeTopBar(modifier = Modifier.fillMaxWidth(), onMenu = { showMore = true })
                     Box(modifier = Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(Claude.inputRadius))) {
                         chatContent()
                     }
@@ -83,13 +85,22 @@ fun ClaudeShell(
             Column(modifier = Modifier.fillMaxSize()) {
                 ClaudeTopBar(
                     modifier = Modifier.fillMaxWidth(),
-                    onMenu = { onOpenSession("") },
+                    onMenu = { showMore = true },
                 )
                 Box(modifier = Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(Claude.inputRadius))) {
                     chatContent()
                 }
                 ClaudeInputBar(modifier = Modifier.fillMaxWidth())
             }
+        }
+        if (showMore) {
+            ClaudeMoreMenu(
+                onEntry = { e ->
+                    showMore = false
+                    onMoreEntry(e)
+                },
+                onDismiss = { showMore = false },
+            )
         }
     }
 }
@@ -154,6 +165,65 @@ fun ClaudeTopBar(
 @Composable
 private fun DividerVLine(modifier: Modifier = Modifier) {
     Box(modifier = modifier.width(1.dp).background(Claude.edge))
+}
+
+/** Claude 风格"更多"功能菜单：覆盖层 + 分组列表（Omega 功能入口）。 */
+@Composable
+fun ClaudeMoreMenu(
+    onEntry: (com.mibot.ui.hq.HqMoreEntry) -> Unit = {},
+    onDismiss: () -> Unit = {},
+    modifier: Modifier = Modifier,
+) {
+    val entries = listOf(
+        com.mibot.ui.hq.HqMoreEntry("bots", "机器人", com.mibot.ui.theme.MikaIcons.Spark, Claude.accent),
+        com.mibot.ui.hq.HqMoreEntry("settings", "设置", com.mibot.ui.theme.MikaIcons.Gear, Claude.ink2),
+        com.mibot.ui.hq.HqMoreEntry("models", "模型", com.mibot.ui.theme.MikaIcons.Star, Claude.accent),
+        com.mibot.ui.hq.HqMoreEntry("groups", "模型组", com.mibot.ui.theme.MikaIcons.Apps, Claude.accent),
+        com.mibot.ui.hq.HqMoreEntry("vault", "账户金库", com.mibot.ui.theme.MikaIcons.Shield, Claude.ink2),
+        com.mibot.ui.hq.HqMoreEntry("dynamics", "动态", com.mibot.ui.theme.MikaIcons.Spark, Claude.accent),
+        com.mibot.ui.hq.HqMoreEntry("opencode", "OpenCode", com.mibot.ui.theme.MikaIcons.Globe, Claude.accent),
+        com.mibot.ui.hq.HqMoreEntry("groupchats", "群聊", com.mibot.ui.theme.MikaIcons.Route, Claude.ink2),
+        com.mibot.ui.hq.HqMoreEntry("voice", "语音模型", com.mibot.ui.theme.MikaIcons.Message, Claude.accent),
+        com.mibot.ui.hq.HqMoreEntry("files", "文件库", com.mibot.ui.theme.MikaIcons.Folder, Claude.ink2),
+        com.mibot.ui.hq.HqMoreEntry("memory", "记忆", com.mibot.ui.theme.MikaIcons.Spark, Claude.accent),
+        com.mibot.ui.hq.HqMoreEntry("usage", "用量", com.mibot.ui.theme.MikaIcons.Chart, Claude.accent),
+        com.mibot.ui.hq.HqMoreEntry("calls", "通话", com.mibot.ui.theme.MikaIcons.Message, Claude.accent),
+        com.mibot.ui.hq.HqMoreEntry("plugins", "插件中心", com.mibot.ui.theme.MikaIcons.Apps, Claude.accent),
+    )
+    androidx.compose.foundation.layout.Box(
+        modifier = modifier.fillMaxSize().background(Color(0x99000000)).clickable(onClick = onDismiss),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(0.92f)
+                .clip(RoundedCornerShape(Claude.cardRadius))
+                .background(Claude.surface)
+                .padding(vertical = 14.dp),
+        ) {
+            Text("More", style = ClaudeType.ScreenTitle, color = Claude.ink, modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp))
+            Spacer(Modifier.height(6.dp))
+            entries.forEach { e ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp, vertical = 2.dp)
+                        .clip(RoundedCornerShape(Claude.cardRadius))
+                        .clickable { onEntry(e) }
+                        .padding(horizontal = 12.dp, vertical = 11.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Box(
+                        Modifier.size(28.dp).clip(RoundedCornerShape(7.dp)).background(e.tint.copy(alpha = 0.18f)),
+                        contentAlignment = Alignment.Center,
+                    ) { androidx.compose.material3.Icon(e.icon, null, tint = e.tint, modifier = Modifier.size(15.dp)) }
+                    Spacer(Modifier.width(12.dp))
+                    Text(e.name, style = ClaudeType.Body, color = Claude.ink, modifier = Modifier.weight(1f))
+                    ClaudeSparkIcon(size = 12.dp, color = Claude.ink3)
+                }
+            }
+        }
+    }
 }
 
 /** 会话行（Claude 侧栏项）。 */

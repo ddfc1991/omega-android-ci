@@ -58,6 +58,7 @@ fun ClaudeUiPreviewScreen(
         },
         onDeleteSession = {},
         showSidebar = true,
+        onMoreEntry = onMoreEntry,
         modifier = modifier,
     )
 }
