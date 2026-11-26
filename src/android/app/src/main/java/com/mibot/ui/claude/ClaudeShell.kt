@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -54,26 +55,41 @@ fun ClaudeShell(
     modifier: Modifier = Modifier,
     showSidebar: Boolean = true,
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Claude.bg),
+    androidx.compose.foundation.layout.BoxWithConstraints(
+        modifier = modifier.fillMaxSize().background(Claude.bg),
     ) {
-        if (showSidebar) {
-            ClaudeSidebar(
-                sessions = sessions,
-                onOpenSession = onOpenSession,
-                onDeleteSession = onDeleteSession,
-                modifier = Modifier.width(300.dp),
-            )
-            DividerVLine(modifier = Modifier.fillMaxHeight())
-        }
-        Column(modifier = Modifier.weight(1f).fillMaxSize()) {
-            ClaudeTopBar(modifier = Modifier.fillMaxWidth())
-            Box(modifier = Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(Claude.inputRadius))) {
-                chatContent()
+        // 手机(窄屏)全宽聊天:侧栏折叠成汉堡弹出;桌面(宽屏)才并排侧栏。
+        val wide = maxWidth >= 600.dp
+        val sidebarVisible = showSidebar && wide
+        if (sidebarVisible) {
+            Row(Modifier.fillMaxSize()) {
+                ClaudeSidebar(
+                    sessions = sessions,
+                    onOpenSession = onOpenSession,
+                    onDeleteSession = onDeleteSession,
+                    modifier = Modifier.width(300.dp),
+                )
+                DividerVLine(modifier = Modifier.fillMaxHeight())
+                Column(modifier = Modifier.weight(1f).fillMaxSize()) {
+                    ClaudeTopBar(modifier = Modifier.fillMaxWidth())
+                    Box(modifier = Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(Claude.inputRadius))) {
+                        chatContent()
+                    }
+                    ClaudeInputBar(modifier = Modifier.fillMaxWidth())
+                }
             }
-            ClaudeInputBar(modifier = Modifier.fillMaxWidth())
+        } else {
+            // 窄屏:顶栏(汉堡开侧栏) + 全宽聊天 + 底部横排输入栏
+            Column(modifier = Modifier.fillMaxSize()) {
+                ClaudeTopBar(
+                    modifier = Modifier.fillMaxWidth(),
+                    onMenu = { onOpenSession("") },
+                )
+                Box(modifier = Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(Claude.inputRadius))) {
+                    chatContent()
+                }
+                ClaudeInputBar(modifier = Modifier.fillMaxWidth())
+            }
         }
     }
 }
