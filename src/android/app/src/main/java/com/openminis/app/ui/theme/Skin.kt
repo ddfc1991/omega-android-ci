@@ -25,6 +25,18 @@ data class Skin(
 )
 
 object Skins {
+    /** Default = Claude 橙黑：OLED 纯黑 + Claude cinnabar 橙。 */
+    val CLAUDE = Skin(
+        id = "claude",
+        name = "Claude 橙黑",
+        isDark = true,
+        bg = Color(0xFF0A0A0A),
+        surface = Color(0xFF1C1C1E),
+        text = Color(0xFFFFFFFF),
+        text2 = Color(0xFF8E8E93),
+        accent = Color(0xFFD97757),
+    )
+
     /** Default = Hermes HQ: OLED black + iOS blue. */
     val HERMES = Skin(
         id = "hermes",
@@ -61,7 +73,7 @@ object Skins {
         Skin("warm_black", "暖白 + 黑", false, Color(0xFFFFF8F2), Color(0xFFFFFFFF), Color(0xFF190300), Color(0x99190300), Color(0xFF190300)),
     )
 
-    fun byId(id: String?): Skin = ALL.firstOrNull { it.id == id } ?: HERMES
+    fun byId(id: String?): Skin = ALL.firstOrNull { it.id == id } ?: CLAUDE
 }
 
 /** Persists the selected skin and publishes it to Compose. */
@@ -69,12 +81,13 @@ object SkinStore {
     private const val PREFS = "omega_skin"
     private const val KEY = "skin_id"
 
-    private val _current = MutableStateFlow(Skins.HERMES)
+    private val _current = MutableStateFlow(Skins.CLAUDE)
     val current: StateFlow<Skin> = _current.asStateFlow()
 
     fun init(context: Context) {
         val sp = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        _current.value = Skins.byId(sp.getString(KEY, null))
+        // [claude] 默认 Claude 橙黑；用户手动选过的才尊重其选择。
+        _current.value = Skins.byId(sp.getString(KEY, null).takeUnless { it == "hermes" })
     }
 
     fun select(context: Context, skin: Skin) {

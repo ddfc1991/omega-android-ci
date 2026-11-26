@@ -230,6 +230,45 @@ val HermesDarkChatPalette = DarkChatPalette.copy(
     fabAccent = Color(0xFF0A84FF),
 )
 
+// [claude] Claude 聊天页 palette：纯黑底、用户气泡中性深灰（非橙）、
+// 发送/链接/思考用 Claude cinnabar #D97757。助手消息无气泡纯文本。
+val ClaudeDarkChatPalette = DarkChatPalette.copy(
+    background = Color(0xFF0A0A0A),
+    secondaryBg = Color(0xFF1C1C1E),
+    inputBg = Color(0xFF1C1C1E),
+    inputIconBg = Color(0xFF2C2C2E),
+    inputIconBorder = Color(0xFF45454A),
+    inputBorder = Color(0xFF45454A),
+    primaryText = Color(0xFFFFFFFF),
+    secondaryText = Color(0x998E8E93),
+    tertiaryText = Color(0x4D8E8E93),
+    disabledText = Color(0x2EFFFFFF),
+    // 用户气泡：Claude 中性深灰（不是蓝也不是橙）
+    userBubble = Color(0xFF2E2E33),
+    toolBg = Color(0xFF1E1E1E),
+    toolBorder = Color(0xFF2C2C2E),
+    toolCapsuleBg = Color(0xFF1C1C1E),
+    separator = Color(0x99545458),
+    sendButton = Color(0xFFD97757),
+    sendButtonDisabled = Color(0x4DD97757),
+    codeBlockBg = Color(0xFF1C1C1E),
+    codeBlockText = Color(0xFF30D158),
+    inlineCodeBg = Color(0xFF2C2C2E),
+    inlineCodeText = Color(0xFFFF9F0A),
+    link = Color(0xFFD97757),
+    blockquoteBar = Color(0x80D97757),
+    thinking = Color(0xFFD97757),
+    warningBg = Color(0x14D97757),
+    warningText = Color(0x73FFFFFF),
+    tableBorder = Color(0xFF38383A),
+    inputShadow = Color(0x80000000),
+    toastBg = Color(0x2ED97757),
+    thumbnailBorder = Color(0x20545458),
+    sheetHeaderBg = Color(0xFF1C1C1E),
+    sheetHeaderBorder = Color(0x33FFFFFF),
+    fabAccent = Color(0xFFD97757),
+)
+
 val LocalChatPalette = compositionLocalOf { LightChatPalette }
 
 // Short accessor: ChatColors.primaryText instead of LocalChatPalette.current.primaryText

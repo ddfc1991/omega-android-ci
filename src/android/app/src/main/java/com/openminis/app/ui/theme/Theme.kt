@@ -177,6 +177,8 @@ fun skinColorScheme(skin: Skin) = (if (skin.isDark) darkColorScheme() else light
 
 /** [destiny/omega-skin] Chat palette derived from the user's skin. */
 fun skinChatPalette(skin: Skin): ChatPalette {
+    // [claude] Claude skin 用专用 Claude palette（中性气泡，非 accent 色）。
+    if (skin.id == "claude") return ClaudeDarkChatPalette
     val base = if (skin.isDark) DarkChatPalette else LightChatPalette
     return base.copy(
         isDark = skin.isDark,
