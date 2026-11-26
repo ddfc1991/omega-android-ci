@@ -66,7 +66,7 @@ fun ClaudeShell(
         // 手机(窄屏)全宽聊天:侧栏折叠成汉堡弹出;桌面(宽屏)才并排侧栏。
         val wide = maxWidth >= 600.dp
         val sidebarVisible = showSidebar && wide
-        var showMore by remember { mutableStateOf(false) }
+        val showMore = remember { mutableStateOf(false) }
         if (sidebarVisible) {
             Row(Modifier.fillMaxSize()) {
                 ClaudeSidebar(
@@ -77,7 +77,7 @@ fun ClaudeShell(
                 )
                 DividerVLine(modifier = Modifier.fillMaxHeight())
                 Column(modifier = Modifier.weight(1f).fillMaxSize()) {
-                    ClaudeTopBar(modifier = Modifier.fillMaxWidth(), onMenu = { showMore = true })
+                    ClaudeTopBar(modifier = Modifier.fillMaxWidth(), onMenu = { showMore.value = true })
                     Box(modifier = Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(Claude.inputRadius))) {
                         chatContent()
                     }
@@ -89,7 +89,7 @@ fun ClaudeShell(
             Column(modifier = Modifier.fillMaxSize()) {
                 ClaudeTopBar(
                     modifier = Modifier.fillMaxWidth(),
-                    onMenu = { showMore = true },
+                    onMenu = { showMore.value = true },
                 )
                 Box(modifier = Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(Claude.inputRadius))) {
                     chatContent()
@@ -97,13 +97,13 @@ fun ClaudeShell(
                 ClaudeInputBar(modifier = Modifier.fillMaxWidth())
             }
         }
-        if (showMore) {
+        if (showMore.value) {
             ClaudeMoreMenu(
                 onEntry = { e ->
-                    showMore = false
+                    showMore.value = false
                     onMoreEntry(e)
                 },
-                onDismiss = { showMore = false },
+                onDismiss = { showMore.value = false },
             )
         }
     }
