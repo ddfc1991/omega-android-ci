@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Omega</string>
+    <string name="app_name">Omega Claude</string>
     <!-- [destiny/v7] 远程接入 · 服务器, next to Tailscale in Settings › Network. -->
     <string name="destiny_servers_title">Servers</string>
     <string name="destiny_servers_subtitle">Your machines over Tailscale · list only, Agent does the checks</string>
