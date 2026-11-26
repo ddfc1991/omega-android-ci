@@ -180,6 +180,30 @@ fun GlassDrawerHost(
                         popUpTo(Routes.SESSION_LIST) { inclusive = false }
                     }
                 },
+                onDelete = { item ->
+                    if (!item.id.startsWith("demo-")) {
+                        when (item) {
+                            // Same funnel the session list uses: DB rows, files,
+                            // ViewModel, badges, running child jobs.
+                            is RecentItem.Chat -> scope.launch {
+                                com.openminis.app.data.session.SessionDeleter
+                                    .deleteTree(context, chatRepository, item.id, "sidebar")
+                                // If the deleted chat is the one on screen, fall
+                                // back to the list instead of stranding an empty
+                                // conversation.
+                                if (navController.currentBackStackEntry?.arguments?.getString("sessionId") == item.id) {
+                                    navController.popBackStack(Routes.SESSION_LIST, inclusive = false)
+                                }
+                            }
+                            is RecentItem.Group -> {
+                                com.openminis.app.mibot.groups.GroupChats.delete(context, item.id)
+                                if (navController.currentBackStackEntry?.arguments?.getString("groupId") == item.id) {
+                                    navController.popBackStack(Routes.SESSION_LIST, inclusive = false)
+                                }
+                            }
+                        }
+                    }
+                },
             )
           }
         },
