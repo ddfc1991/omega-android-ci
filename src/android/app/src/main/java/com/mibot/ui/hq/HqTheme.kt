@@ -12,8 +12,8 @@ import androidx.compose.ui.unit.sp
  * 全部色值来自真机截图逐屏提取（见 workspace/hermes-hq-replica/规范.md）。
  */
 object Hq {
-    /** 页面背景：OLED 近纯黑。 */
-    val bg = Color(0xFF0A0A0A)
+    /** 页面背景：Claude 纯黑。 */
+    val bg = Color(0xFF000000)
     /** 表面/卡片：iOS secondarySystemBackground dark。 */
     val surface = Color(0xFF1C1C1E)
     /** 更深表面（bot 气泡、审批卡）。 */
@@ -26,10 +26,10 @@ object Hq {
     val ink2 = Color(0xFF8E8E93)
     /** 三级（描述、更淡）。 */
     val ink3 = Color(0xFFD1D1D6)
-    /** 强调蓝（选中 tab、主按钮、链接）。 */
-    val accent = Color(0xFF0A84FF)
-    /** 用户气泡蓝。 */
-    val bubbleUser = Color(0xFF3478F6)
+    /** 强调色：Claude 橙（选中 tab、主按钮、链接）。 */
+    val accent = Color(0xFFD97757)
+    /** 用户气泡：Claude 橙。 */
+    val bubbleUser = Color(0xFFD97757)
     /** bot 气泡深灰。 */
     val bubbleBot = Color(0xFF1E1E1E)
     /** 毛玻璃底/边（输入框）。 */
