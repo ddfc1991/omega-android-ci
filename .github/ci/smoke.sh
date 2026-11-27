@@ -32,10 +32,16 @@ shot 01-chats 2
 tap desc "Open sidebar" && shot 02-sidebar 3 || { echo "::warning::sidebar button not found"; fail=1; }
 adb shell input keyevent KEYCODE_BACK; sleep 2
 
-for t in Feed:03-feed Ideas:04-ideas "Group chats":05-groups Settings:06-settings; do
+# [fork/magpie-tab] Bottom bar is CHATS / FEED / MAGPIE / GROUPS.
+# Ideas and Settings are no longer bottom tabs: Ideas still has its route,
+# Settings is now the pinned row at the sidebar bottom.
+for t in Feed:03-feed Magpie:04-magpie "Group chats":05-groups; do
   name="${t%%:*}"; file="${t##*:}"
   if tap desc "$name"; then shot "$file" 3; else echo "::warning::tab $name not found"; fail=1; fi
 done
+# Settings now lives in the sidebar: open it, tap the pinned Settings row.
+tap desc "Open sidebar" >/dev/null 2>&1 || true; sleep 1
+if tap desc "Settings"; then shot 06-settings 3; else echo "::warning::sidebar Settings row not found"; fail=1; fi
 # Settings page scrolled to the Appearance / Feedback rows.
 adb shell input swipe 540 1700 540 900 400; shot 07-settings-scrolled 2
 
@@ -77,11 +83,15 @@ for th in 1:light 2:dark; do
   alive || { echo "::error::app not running (zh $n)"; fail=1; }
   zshot "$n-01-onboarding" 1
   tap desc "群聊" && zshot "$n-04-groups" 3 || echo "::warning::zh 群聊 tab not found ($n)"
-  tap desc "设置" && zshot "$n-05-settings" 3 || echo "::warning::zh 设置 tab not found ($n)"
   tap desc "对话" >/dev/null 2>&1 || true; sleep 2
   if tap desc "打开侧边栏"; then
     zshot "$n-03-sidebar" 3
-    if tap desc "新对话"; then zshot "$n-02-chat" 3; adb shell input keyevent KEYCODE_BACK; sleep 1; else echo "::warning::zh new-chat not found ($n)"; fi
+    # [fork/settings-sidebar] Settings is the pinned bottom row, not a tab.
+    if tap desc "设置"; then zshot "$n-05-settings" 3; else echo "::warning::zh sidebar 设置 not found ($n)"; fi
+    tap desc "对话" >/dev/null 2>&1 || true; sleep 1
+    if tap desc "打开侧边栏"; then
+      if tap desc "新对话"; then zshot "$n-02-chat" 3; adb shell input keyevent KEYCODE_BACK; sleep 1; else echo "::warning::zh new-chat not found ($n)"; fi
+    else echo "::warning::zh sidebar button not found ($n)"; fi
   else echo "::warning::zh sidebar button not found ($n)"; fi
   home
   link vault;        zshot "$n-06-vault" 4;    home
