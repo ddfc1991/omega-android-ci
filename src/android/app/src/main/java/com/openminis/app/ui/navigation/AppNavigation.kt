@@ -1002,7 +1002,7 @@ fun AppNavigation(
                         "dynamics" -> navController.safeNavigate(Routes.DYNAMICS)
                         "opencode" -> navController.safeNavigate(Routes.MIBOT_OPENCODE)
                         "voice" -> navController.safeNavigate(Routes.MIBOT_VOICE)
-                        else -> navController.safePop()
+                        else -> navController.popBackStack()
                     }
                 },
             )
