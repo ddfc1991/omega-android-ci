@@ -53,8 +53,8 @@ fun ClaudeUiPreviewScreen(
         },
         sessions = sessions,
         onOpenSession = { id ->
+            // 只切换选中会话（壳内聊天），不跳走旧 Omega 聊天页
             selectedId = id
-            onOpenSession(id)
         },
         onDeleteSession = {},
         showSidebar = true,

@@ -978,7 +978,31 @@ fun AppNavigation(
                         "dynamics" -> navController.safeNavigate(Routes.DYNAMICS)
                         "opencode" -> navController.safeNavigate(Routes.MIBOT_OPENCODE)
                         "voice" -> navController.safeNavigate(Routes.MIBOT_VOICE)
+                        "more" -> navController.safeNavigate("hq_more")
                         else -> {}
+                    }
+                },
+            )
+        }
+        composable("hq_more") {
+            com.mibot.ui.hq.HqMoreScreen(
+                onEntry = { entry ->
+                    when (entry.id) {
+                        "settings" -> navController.safeNavigate(Routes.SETTINGS)
+                        "models" -> navController.safeNavigate(Routes.PROVIDER_LIST)
+                        "groups" -> navController.safeNavigate(Routes.MODEL_GROUPS)
+                        "bots" -> navController.safeNavigate(com.openminis.app.ui.glass.GlassRoutes.BOTS)
+                        "plugins" -> navController.safeNavigate(com.openminis.app.mibot.plugins.PluginRoutes.MARKET)
+                        "groupchats" -> navController.safeNavigate(com.openminis.app.ui.glass.GlassRoutes.GROUPS)
+                        "memory" -> navController.safeNavigate(Routes.MEMORY)
+                        "usage" -> navController.safeNavigate(Routes.USAGE_STATS)
+                        "files" -> navController.safeNavigate(Routes.SETTINGS)
+                        "vault" -> navController.safeNavigate(com.openminis.app.mibot.vault.VaultRoutes.LIST)
+                        "calls" -> navController.safeNavigate(Routes.MIBOT_CALLS)
+                        "dynamics" -> navController.safeNavigate(Routes.DYNAMICS)
+                        "opencode" -> navController.safeNavigate(Routes.MIBOT_OPENCODE)
+                        "voice" -> navController.safeNavigate(Routes.MIBOT_VOICE)
+                        else -> navController.safePop()
                     }
                 },
             )
@@ -1002,6 +1026,7 @@ fun AppNavigation(
                         "dynamics" -> navController.safeNavigate(Routes.DYNAMICS)
                         "opencode" -> navController.safeNavigate(Routes.MIBOT_OPENCODE)
                         "claude" -> navController.safeNavigate(Routes.CLAUDE_PREVIEW)
+                        "more" -> navController.safeNavigate("hq_more")
                         else -> {}
                     }
                 },
@@ -1026,6 +1051,7 @@ fun AppNavigation(
                         "dynamics" -> navController.safeNavigate(Routes.DYNAMICS)
                         "opencode" -> navController.safeNavigate(Routes.MIBOT_OPENCODE)
                         "claude" -> navController.safeNavigate(Routes.CLAUDE_PREVIEW)
+                        "more" -> navController.safeNavigate("hq_more")
                         else -> {}
                     }
                 },

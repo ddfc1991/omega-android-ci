@@ -51,6 +51,8 @@ fun ClaudeInputBar(
     enabled: Boolean = true,
 ) {
     var text by remember { mutableStateOf("") }
+    val focus = androidx.compose.ui.platform.LocalFocusManager.current
+
     Column(
         modifier = modifier
             .navigationBarsPadding()
@@ -63,22 +65,41 @@ fun ClaudeInputBar(
                 .clip(RoundedCornerShape(Claude.inputRadius))
                 .background(Claude.surface)
                 .border(1.dp, Claude.edge, RoundedCornerShape(Claude.inputRadius))
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.Bottom,
         ) {
-            Box(Modifier.weight(1f)) {
-                if (text.isEmpty()) {
-                    Text(text = placeholder, style = ClaudeType.Body.copy(color = Claude.ink3))
-                } else {
-                    Text(text = text, style = ClaudeType.Body)
-                }
-            }
-            Spacer(Modifier.width(12.dp))
+            androidx.compose.foundation.text.BasicTextField(
+                value = text,
+                onValueChange = { if (enabled) text = it },
+                enabled = enabled,
+                modifier = Modifier
+                    .weight(1f),
+                textStyle = ClaudeType.Body.copy(color = Claude.ink),
+                cursorBrush = androidx.compose.ui.graphics.Brush(Claude.accent),
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                    imeAction = androidx.compose.ui.text.input.ImeAction.Send,
+                    enterIsNotSent = true,
+                    autoCorrect = true,
+                ),
+                keyboardActions = androidx.compose.foundation.text.KeyboardActions(
+                    onSend = {
+                        if (text.isNotBlank()) { onSend(text); text = ""; focus.clearFocus() }
+                    },
+                ),
+                decorationBox = { inner ->
+                    androidx.compose.foundation.layout.Box(contentAlignment = androidx.compose.ui.Alignment.CenterStart) {
+                        if (text.isEmpty()) {
+                            Text(placeholder, style = ClaudeType.Body.copy(color = Claude.ink3))
+                        }
+                        inner()
+                    }
+                },
+            )
+            Spacer(Modifier.width(10.dp))
             ClaudeSendButton(
                 enabled = enabled && text.isNotBlank(),
                 onClick = {
-                    onSend(text)
-                    text = ""
+                    if (text.isNotBlank()) { onSend(text); text = ""; focus.clearFocus() }
                 },
             )
         }

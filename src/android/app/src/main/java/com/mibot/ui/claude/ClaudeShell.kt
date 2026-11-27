@@ -189,21 +189,12 @@ fun ClaudeMoreMenu(
     onDismiss: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    val entries = listOf(
-        com.mibot.ui.hq.HqMoreEntry("bots", "机器人", com.mibot.ui.theme.MikaIcons.Spark, Claude.accent),
-        com.mibot.ui.hq.HqMoreEntry("settings", "设置", com.mibot.ui.theme.MikaIcons.Gear, Claude.ink2),
-        com.mibot.ui.hq.HqMoreEntry("models", "模型", com.mibot.ui.theme.MikaIcons.Star, Claude.accent),
-        com.mibot.ui.hq.HqMoreEntry("groups", "模型组", com.mibot.ui.theme.MikaIcons.Apps, Claude.accent),
-        com.mibot.ui.hq.HqMoreEntry("vault", "账户金库", com.mibot.ui.theme.MikaIcons.Shield, Claude.ink2),
-        com.mibot.ui.hq.HqMoreEntry("dynamics", "动态", com.mibot.ui.theme.MikaIcons.Spark, Claude.accent),
-        com.mibot.ui.hq.HqMoreEntry("opencode", "OpenCode", com.mibot.ui.theme.MikaIcons.Globe, Claude.accent),
-        com.mibot.ui.hq.HqMoreEntry("groupchats", "群聊", com.mibot.ui.theme.MikaIcons.Route, Claude.ink2),
-        com.mibot.ui.hq.HqMoreEntry("voice", "语音模型", com.mibot.ui.theme.MikaIcons.Message, Claude.accent),
-        com.mibot.ui.hq.HqMoreEntry("files", "文件库", com.mibot.ui.theme.MikaIcons.Folder, Claude.ink2),
-        com.mibot.ui.hq.HqMoreEntry("memory", "记忆", com.mibot.ui.theme.MikaIcons.Spark, Claude.accent),
-        com.mibot.ui.hq.HqMoreEntry("usage", "用量", com.mibot.ui.theme.MikaIcons.Chart, Claude.accent),
-        com.mibot.ui.hq.HqMoreEntry("calls", "通话", com.mibot.ui.theme.MikaIcons.Message, Claude.accent),
-        com.mibot.ui.hq.HqMoreEntry("plugins", "插件中心", com.mibot.ui.theme.MikaIcons.Apps, Claude.accent),
+    // 极简菜单：只核心项 + 「更多功能」进全量页（去掉与更多页重复的长列表）
+    val core = listOf(
+        "bots" to "机器人",
+        "settings" to "设置",
+        "models" to "模型",
+        "usage" to "用量",
     )
     androidx.compose.foundation.layout.Box(
         modifier = modifier.fillMaxSize().background(Color(0x99000000)).clickable(onClick = onDismiss),
@@ -218,24 +209,33 @@ fun ClaudeMoreMenu(
         ) {
             Text("More", style = ClaudeType.ScreenTitle, color = Claude.ink, modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp))
             Spacer(Modifier.height(6.dp))
-            entries.forEach { e ->
+            core.forEach { (id, label) ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 10.dp, vertical = 2.dp)
+                        .padding(horizontal = 12.dp, vertical = 2.dp)
                         .clip(RoundedCornerShape(Claude.cardRadius))
-                        .clickable { onEntry(e) }
-                        .padding(horizontal = 12.dp, vertical = 11.dp),
+                        .clickable { onEntry(com.mibot.ui.hq.HqMoreEntry(id, label, com.mibot.ui.theme.MikaIcons.Gear, Claude.ink)) }
+                        .padding(horizontal = 12.dp, vertical = 13.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Box(
-                        Modifier.size(28.dp).clip(RoundedCornerShape(7.dp)).background(e.tint.copy(alpha = 0.18f)),
-                        contentAlignment = Alignment.Center,
-                    ) { androidx.compose.material3.Icon(e.icon, null, tint = e.tint, modifier = Modifier.size(15.dp)) }
-                    Spacer(Modifier.width(12.dp))
-                    Text(e.name, style = ClaudeType.Body, color = Claude.ink, modifier = Modifier.weight(1f))
-                    ClaudeSparkIcon(size = 12.dp, color = Claude.ink3)
+                    Text(label, style = ClaudeType.Body, color = Claude.ink)
                 }
+            }
+            Spacer(Modifier.height(6.dp))
+            Box(Modifier.fillMaxWidth().padding(horizontal = 24.dp).height(1.dp).background(Claude.edge))
+            Spacer(Modifier.height(6.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 2.dp)
+                    .clip(RoundedCornerShape(Claude.cardRadius))
+                    .clickable { onEntry(com.mibot.ui.hq.HqMoreEntry("more", "更多", com.mibot.ui.theme.MikaIcons.Gear, Claude.ink)) }
+                    .padding(horizontal = 12.dp, vertical = 13.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text("更多功能", style = ClaudeType.Body, color = Claude.ink, modifier = Modifier.weight(1f))
+                Text("›", style = ClaudeType.Body, color = Claude.ink3)
             }
         }
     }
