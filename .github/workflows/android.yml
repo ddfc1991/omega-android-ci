@@ -140,9 +140,10 @@ jobs:
           ./gradlew --no-daemon :app:assembleDebug -Dorg.gradle.jvmargs="-Xmx4g -Dfile.encoding=UTF-8" 2>&1 | tee /tmp/build.log
           rc=${PIPESTATUS[0]}
           if [ "$rc" -ne 0 ]; then
-            mkdir -p out
-            { echo "### Compiler errors"; grep -E 'e: |error:|BUILD FAILED' /tmp/build.log | tail -40; echo "--- tail ---"; tail -40 /tmp/build.log; } > out/compiler-errors.txt || true
-            cat out/compiler-errors.txt >> "$GITHUB_STEP_SUMMARY" || true
+            echo "### Compiler errors" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            grep -E '^e: |error:' /tmp/build.log | head -40 >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
           fi
           exit "$rc"
 
