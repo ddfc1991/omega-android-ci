@@ -71,7 +71,7 @@ enum class GlassTab(val labelRes: Int, val icon: ImageVector, val selectedIcon: 
     // [fork/magpie-tab] The Ideas slot is now the Magpie gateway page. The
     // IDEAS enum value stays (its route/page still exist) but leaves the bar.
     IDEAS(R.string.glass_tab_ideas, Icons.Outlined.Lightbulb, Icons.Filled.Lightbulb),
-    MAGPIE(R.string.glass_tab_magpie, Icons.Outlined.Lan, Icons.Filled.Lan),
+    MAGPIE(R.string.glass_tab_magpie, Icons.Outlined.Hub, Icons.Filled.Hub),
     // [fork/mibot-ui-tabs] Bots moved to Settings; this slot is 群聊 now.
     GROUPS(R.string.glass_tab_groups, Icons.Outlined.Groups, Icons.Filled.Groups),
     // [fork/settings-sidebar] Settings lives at the sidebar bottom now; the
