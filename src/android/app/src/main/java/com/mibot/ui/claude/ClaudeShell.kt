@@ -77,7 +77,7 @@ fun ClaudeShell(
                 )
                 DividerVLine(modifier = Modifier.fillMaxHeight())
                 Column(modifier = Modifier.weight(1f).fillMaxSize()) {
-                    ClaudeTopBar(modifier = Modifier.fillMaxWidth(), onMenu = { showMore.value = true })
+                    ClaudeTopBar(modifier = Modifier.fillMaxWidth(), onMenu = { showMore.value = true }, onSpark = { showMore.value = true })
                     Box(modifier = Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(Claude.inputRadius))) {
                         chatContent()
                     }
@@ -90,6 +90,7 @@ fun ClaudeShell(
                 ClaudeTopBar(
                     modifier = Modifier.fillMaxWidth(),
                     onMenu = { showMore.value = true },
+                    onSpark = { showMore.value = true },
                 )
                 Box(modifier = Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(Claude.inputRadius))) {
                     chatContent()
@@ -144,11 +145,12 @@ fun ClaudeSidebar(
     }
 }
 
-/** 顶栏：左上 `≡` 两横线 + 右上 Claude 图标。 */
+/** 顶栏：左上 `≡` + 中间 Claude wordmark + 右上橙 asterisk（可点 = 打开更多）。 */
 @Composable
 fun ClaudeTopBar(
     modifier: Modifier = Modifier,
     onMenu: () -> Unit = {},
+    onSpark: () -> Unit = {},
     title: String? = null,
 ) {
     Row(
@@ -160,8 +162,17 @@ fun ClaudeTopBar(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         ClaudeHamburger(modifier = Modifier.size(20.dp), color = Claude.ink2, onClick = onMenu)
-        if (title != null) Text(title, style = ClaudeType.RowTitle)
-        ClaudeSparkIcon(size = 22.dp, color = Claude.ink2)
+        // 中间 wordmark：Claude 官方居中标题，缺了会让两端"飘"。
+        Text(
+            text = title ?: "Claude",
+            style = ClaudeType.RowTitle.copy(fontWeight = FontWeight.SemiBold),
+            color = Claude.ink,
+        )
+        ClaudeSparkIcon(
+            size = 22.dp,
+            color = Claude.ink2,
+            onClick = onSpark,   // 右上 asterisk 可点 = 打开更多菜单
+        )
     }
 }
 
@@ -322,8 +333,9 @@ fun ClaudeSparkIcon(
     size: androidx.compose.ui.unit.Dp = 24.dp,
     color: Color = Claude.accent,
     modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
 ) {
-    Canvas(modifier = modifier.size(size)) {
+    Canvas(modifier = modifier.size(size).clickable(onClick = onClick)) {
         val cx = size.value / 2f
         val cy = size.value / 2f
         val len = cx * 0.92f
