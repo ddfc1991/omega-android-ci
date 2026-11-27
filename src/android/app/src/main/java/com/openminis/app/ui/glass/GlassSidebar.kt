@@ -95,6 +95,8 @@ fun GlassSidebar(
     val dark = style == GlassStyle.DUSK
     val fg = if (dark) GlassPalette.DuskOn else GlassPalette.WarmOn
     val fgMuted = fg.copy(alpha = 0.72f) // [fork/frost] ≥4.5:1 on the sheet
+    // [fork/settings-sidebar] computed outside semantics lambda (t() is @Composable).
+    val settingsLabel = t("设置", "Settings")
     var query by rememberSaveable { mutableStateOf("") }
     var archivedOpen by rememberSaveable { mutableStateOf(false) }
     var pendingDelete by remember { mutableStateOf<RecentItem?>(null) }
@@ -187,7 +189,7 @@ fun GlassSidebar(
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(12.dp))
                     .clickable(onClick = onOpenSettings)
-                    .semantics { contentDescription = t("设置", "Settings") }
+                    .semantics { contentDescription = settingsLabel }
                     .padding(horizontal = 12.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
