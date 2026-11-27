@@ -43,7 +43,10 @@ done
 # button only exists on the chats tab), then tap the pinned Settings row.
 tap desc "Chats" >/dev/null 2>&1 || true; sleep 1
 tap desc "Open sidebar" >/dev/null 2>&1 || tap text "对话" >/dev/null 2>&1 || true; sleep 1
-if tap text "Settings" || tap desc "Settings"; then shot 06-settings 3; else echo "::warning::sidebar Settings row not found"; fail=1; fi
+if tap text "Settings" || tap desc "Settings"; then shot 06-settings 3; else
+  echo "::warning::sidebar Settings row not found — drawer nodes: $(adb exec-out uiautomator dump /sdcard/d.xml >/dev/null 2>&1; adb exec-out cat /sdcard/d.xml 2>/dev/null | grep -oE 'text="[^"]*"|content-desc="[^"]*"' | sort -u | tr '\n' ' ' | head -c 600)"
+  fail=1
+fi
 adb shell input keyevent KEYCODE_BACK; sleep 1
 # Settings page scrolled to the Appearance / Feedback rows.
 adb shell input swipe 540 1700 540 900 400; shot 07-settings-scrolled 2
