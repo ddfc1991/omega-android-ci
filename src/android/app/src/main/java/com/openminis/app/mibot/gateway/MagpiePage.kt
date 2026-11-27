@@ -180,12 +180,51 @@ fun MagpiePage() {
         // ── model list (probe order) ───────────────────────────────────
         val probes = snap?.probes?.values?.toList().orEmpty()
         if (probes.isEmpty()) {
-            Text(
-                t("还没有体检记录。点「立即体检」跑一次全量探测。", "No probe data yet. Tap \"Check now\" to run a full pass."),
-                color = fgMuted,
-                fontSize = MibotType.Body,
-                modifier = Modifier.padding(top = 24.dp),
-            )
+            // [fork/ux-empty-states] Full empty state: icon + title + reason +
+            // one primary action, not a bare "暂无数据" line.
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 40.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Box(
+                    Modifier
+                        .size(56.dp)
+                        .clip(CircleShape)
+                        .background(accent.copy(alpha = 0.10f)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    com.openminis.app.mibot.design.Glyph(
+                        com.openminis.app.mibot.design.LineIcons.Activity,
+                        size = 28.dp,
+                        tint = accent,
+                    )
+                }
+                Spacer(Modifier.height(14.dp))
+                Text(
+                    t("还没有体检记录", "No health check yet"),
+                    color = fg,
+                    fontSize = MibotType.Body,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
+                )
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    t("Mibot 每天自动刷新模型并体检；也可以现在手动跑一次，通的快的会排在最前面。",
+                      "Mibot refreshes and checks models daily, or run a pass now — working, fast models sort first."),
+                    color = fgMuted,
+                    fontSize = MibotType.Caption,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                )
+                Spacer(Modifier.height(16.dp))
+                MagpieButton(
+                    label = t("立即体检", "Check now"),
+                    accent = accent,
+                    fg = fg,
+                    enabled = gatewayUp == true && !checking,
+                ) { recheck() }
+            }
         } else {
             val ordered = probes.sortedWith(
                 compareBy({ if (it.ok) 0 else 1 }, { if (it.ok) it.ms else Long.MAX_VALUE }),
