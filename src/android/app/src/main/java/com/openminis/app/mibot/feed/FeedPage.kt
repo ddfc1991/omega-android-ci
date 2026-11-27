@@ -79,10 +79,39 @@ fun FeedPage(
     val entries by store.entries.collectAsState()
     var confirmDelete by remember { mutableStateOf<FeedEntry?>(null) }
     var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
+    // [fork/team-dynamics] Toggle between on-device feed and the agent team feed.
+    var showTeam by rememberSaveable { mutableStateOf(false) }
     val zh = LocalConfiguration.current.locales.let { !it.isEmpty && it[0].language == "zh" }
     LaunchedEffect(Unit) {
         store.refresh()
         while (true) { delay(60_000); now = System.currentTimeMillis() }
+    }
+
+    // [fork/team-dynamics] Segmented switch: local feed vs agent team feed.
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+    ) {
+        listOf(false to t("本机动态", "On-device"), true to t("团队动态", "Team")).forEach { (team, label) ->
+            val active = team == showTeam
+            Box(
+                Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.14f) else Color.Transparent)
+                    .clickable { showTeam = team }
+                    .padding(vertical = 10.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(label, color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = if (active) androidx.compose.ui.text.font.FontWeight.SemiBold else androidx.compose.ui.text.font.FontWeight.Normal, fontSize = MibotType.Body)
+            }
+        }
+    }
+
+    if (showTeam) {
+        com.openminis.app.mibot.dynamics.TeamDynamicsPage()
+        return
     }
 
     LazyColumn(
