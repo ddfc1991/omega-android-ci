@@ -153,39 +153,40 @@ val DarkChatPalette = ChatPalette(
     fabAccent = Color(0xFF504C42),
 )
 
-// [fork/mibot-v5] Chat colours for the Mibot design system: neutral glass
-// user bubbles, one cinnabar accent (send / links), frosted tool capsules.
+// [fork/muse] Chat colours for the Muse design language (Mines build-36):
+// user bubble = design blue #007FBD with white text; AI replies stay on the
+// frosted card; send / links / FAB in the same blue.
 val MibotLightChatPalette = LightChatPalette.copy(
-    background = Color(0xFFF3F0EA),
+    background = Color(0xFFF8F5F5),
     secondaryBg = Color(0xE6FFFFFF),
     inputBg = Color(0xF2FFFFFF),
-    inputIconBg = Color(0xFFF1EEE9),
+    inputIconBg = Color(0xFFF2F3F4),
     primaryText = Color(0xFF1B1D22),
-    userBubble = Color(0xFFEAE4DC),
+    userBubble = Color(0xFF007FBD),
     toolBg = Color(0xD9FFFFFF),
     toolCapsuleBg = Color(0xD9FFFFFF),
-    sendButton = Color(0xFFAE4530),
-    link = Color(0xFFAE4530),
+    sendButton = Color(0xFF007FBD),
+    link = Color(0xFF007FBD),
     thinking = Color(0xFF4F6577),
-    toastBg = Color(0x2EAE4530),
-    sheetHeaderBg = Color(0xFFF7F5F1),
-    fabAccent = Color(0xFFAE4530),
+    toastBg = Color(0x2E007FBD),
+    sheetHeaderBg = Color(0xFFFFFFFF),
+    fabAccent = Color(0xFF007FBD),
 )
 
 val MibotDarkChatPalette = DarkChatPalette.copy(
-    background = Color(0xFF0E1014),
-    secondaryBg = Color(0xE61B1D22),
-    inputBg = Color(0xF21B1D22),
-    inputIconBg = Color(0xFF26282E),
-    userBubble = Color(0xFF2A2D34),
-    toolBg = Color(0xD91B1D22),
-    toolCapsuleBg = Color(0xD9181A1F),
-    sendButton = Color(0xFFE07E66),
-    link = Color(0xFFE07E66),
-    thinking = Color(0xFFA9BCCB),
-    toastBg = Color(0x2EE07E66),
-    sheetHeaderBg = Color(0xFF212328),
-    fabAccent = Color(0xFFC8553D),
+    background = Color(0xFF050505),
+    secondaryBg = Color(0xE6161619),
+    inputBg = Color(0xF2161619),
+    inputIconBg = Color(0xFF1E1E22),
+    userBubble = Color(0xFF2E9BD6),
+    toolBg = Color(0xD9161619),
+    toolCapsuleBg = Color(0xD9161619),
+    sendButton = Color(0xFF2E9BD6),
+    link = Color(0xFF2E9BD6),
+    thinking = Color(0xFF9EA3AD),
+    toastBg = Color(0x2E2E9BD6),
+    sheetHeaderBg = Color(0xFF101012),
+    fabAccent = Color(0xFF2E9BD6),
 )
 
 val LocalChatPalette = compositionLocalOf { LightChatPalette }

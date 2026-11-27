@@ -72,8 +72,8 @@ class FrostEnv(
 val LocalFrost = staticCompositionLocalOf { FrostEnv(null, null, false) }
 
 object FrostTokens {
-    private val DarkBase = Color(0xFF16181D)
-    private val LightBase = Color(0xFFFBFAF8)
+    private val DarkBase = Color(0xFF050505)
+    private val LightBase = Color(0xFFF8F5F5)
 
     fun base(dark: Boolean): Color = if (dark) DarkBase else LightBase
 

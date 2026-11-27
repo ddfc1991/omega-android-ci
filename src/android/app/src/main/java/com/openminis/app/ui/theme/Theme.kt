@@ -205,41 +205,39 @@ val LocalMibotActive = androidx.compose.runtime.staticCompositionLocalOf { false
 /** [fork/mibot-v2] Whether the app is currently rendering its dark variant. */
 val LocalMibotDark = androidx.compose.runtime.staticCompositionLocalOf { false }
 
-// [fork/mibot-v5] Mibot palettes — refined, restrained system.
-// Dark = neutral cool graphite (#0E1014 base, layered glass at 6–10 % white);
-// light = warm porcelain. ONE accent (deep cinnabar), used sparingly; every
-// other role is neutral. Contrast (WCAG AA, checked on the frosted card fill):
-//   light accent #AE4530 on card 5.5, white on accent 5.7, on tonal 4.8
-//   dark  accent #E07E66 on glass 5.5, #1A0F0B on accent 6.6
-//   onSurfaceVariant: light #5C606A 6.1, dark #9EA3AD 6.2
+// [fork/muse] Mibot palettes — Muse design language (Mines build-36 spec):
+// Dark = near-black #0A0A0B base; light = cool porcelain #F5F5F7.
+// ONE accent (design blue #007FBD light / #2E9BD6 dark), used for primary
+// buttons, links, send button and the user chat bubble; success green
+// #36B34B family, warning orange #CB823A family. Every other role neutral.
 // `background` stays transparent so every stock Scaffold shows the shared
 // backdrop; cards/sheets are frosted and dialogs stay opaque.
 object MibotPalette {
-    val AccentLight = Color(0xFFAE4530)
-    val AccentDark = Color(0xFFE07E66)
+    val AccentLight = Color(0xFF007FBD)
+    val AccentDark = Color(0xFF2E9BD6)
     val InkLight = Color(0xFF1B1D22)
     val InkMutedLight = Color(0xFF5C606A)
     val InkDark = Color(0xFFE8EAEE)
     val InkMutedDark = Color(0xFF9EA3AD)
-    val Porcelain = Color(0xFFF3F0EA)
-    val Graphite = Color(0xFF0E1014)
+    val Porcelain = Color(0xFFF5F5F7)
+    val Graphite = Color(0xFF0A0A0B)
     // Muted semantic colours (text-safe on the card fill in each theme).
-    val SuccessLight = Color(0xFF456E53)
-    val WarnLight = Color(0xFF87591A)
+    val SuccessLight = Color(0xFF2E8F4A)
+    val WarnLight = Color(0xFFB36A20)
     val ErrorLight = Color(0xFFA8404C)
-    val SuccessDark = Color(0xFF8FBE9D)
-    val WarnDark = Color(0xFFDDB067)
+    val SuccessDark = Color(0xFF4FC96B)
+    val WarnDark = Color(0xFFE09A54)
     val ErrorDark = Color(0xFFEC939C)
 }
 
 val MibotLightColorScheme = lightColorScheme(
     primary = MibotPalette.AccentLight,
     onPrimary = Color.White,
-    primaryContainer = Color(0xFFF1E3DD),
-    onPrimaryContainer = Color(0xFF3E160D),
+    primaryContainer = Color(0xFFD9EDF8),
+    onPrimaryContainer = Color(0xFF0B3A56),
     secondary = Color(0xFF5E6470),
     onSecondary = Color.White,
-    secondaryContainer = Color(0xFFE9E6E1),
+    secondaryContainer = Color(0xFFE9EBEE),
     onSecondaryContainer = MibotPalette.InkLight,
     tertiary = Color(0xFF4F6577),
     onTertiary = Color.White,
@@ -254,10 +252,10 @@ val MibotLightColorScheme = lightColorScheme(
     surfaceVariant = Color(0xD9FFFFFF),
     onSurfaceVariant = MibotPalette.InkMutedLight,
     surfaceContainerLowest = Color(0xC7FFFFFF),
-    surfaceContainerLow = Color(0xE0FCFBF9),
-    surfaceContainer = Color(0xEDFAF9F6),
-    surfaceContainerHigh = Color(0xF5F7F5F1),
-    surfaceContainerHighest = Color(0xFFF1EEE9),
+    surfaceContainerLow = Color(0xE0FCFCFD),
+    surfaceContainer = Color(0xEDFBFBFC),
+    surfaceContainerHigh = Color(0xF5F7F7F9),
+    surfaceContainerHighest = Color(0xFFF2F2F4),
     outline = Color(0xFF9EA1A8),
     outlineVariant = Color(0x2E1B1D22),
     inverseSurface = Color(0xFF26282D),
@@ -267,9 +265,9 @@ val MibotLightColorScheme = lightColorScheme(
 
 val MibotDarkColorScheme = darkColorScheme(
     primary = MibotPalette.AccentDark,
-    onPrimary = Color(0xFF1A0F0B),
-    primaryContainer = Color(0xFF3A2620),
-    onPrimaryContainer = Color(0xFFF6DDD5),
+    onPrimary = Color(0xFF06121C),
+    primaryContainer = Color(0xFF0F3A56),
+    onPrimaryContainer = Color(0xFFCDE6F8),
     secondary = Color(0xFFB4B9C2),
     onSecondary = Color(0xFF1A1C21),
     secondaryContainer = Color(0xFF262930),
@@ -280,15 +278,15 @@ val MibotDarkColorScheme = darkColorScheme(
     onTertiaryContainer = Color(0xFFDCE5EC),
     background = Color.Transparent,
     onBackground = MibotPalette.InkDark,
-    surface = Color(0xB80E1014), // [fork/frost] was 0x8C
+    surface = Color(0xB80A0A0B), // [fork/frost] was 0x8C
     onSurface = MibotPalette.InkDark,
-    surfaceVariant = Color(0xCC1A1C21),
+    surfaceVariant = Color(0xCC131316),
     onSurfaceVariant = MibotPalette.InkMutedDark,
-    surfaceContainerLowest = Color(0xB80B0C10),
-    surfaceContainerLow = Color(0xE0181A1F),
-    surfaceContainer = Color(0xEB1B1D22),
-    surfaceContainerHigh = Color(0xF2212328),
-    surfaceContainerHighest = Color(0xFF282A30),
+    surfaceContainerLowest = Color(0xB8080809),
+    surfaceContainerLow = Color(0xE00F0F11),
+    surfaceContainer = Color(0xEB131316),
+    surfaceContainerHigh = Color(0xF218181B),
+    surfaceContainerHighest = Color(0xFF1E1E22),
     outline = Color(0xFF7E838D),
     outlineVariant = Color(0x29FFFFFF),
     inverseSurface = MibotPalette.InkDark,
