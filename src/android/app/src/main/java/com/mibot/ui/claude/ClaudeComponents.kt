@@ -78,8 +78,6 @@ fun ClaudeInputBar(
                 cursorBrush = androidx.compose.ui.graphics.SolidColor(Claude.accent),
                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                     imeAction = androidx.compose.ui.text.input.ImeAction.Send,
-                    enterIsNotSent = true,
-                    autoCorrect = true,
                 ),
                 keyboardActions = androidx.compose.foundation.text.KeyboardActions(
                     onSend = {
