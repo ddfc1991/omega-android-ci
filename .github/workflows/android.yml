@@ -135,7 +135,17 @@ jobs:
           MIBOT_KEYSTORE_PASSWORD: ${{ secrets.MIBOT_KEYSTORE_PASSWORD }}
           MIBOT_KEY_ALIAS: ${{ secrets.MIBOT_KEY_ALIAS }}
           MIBOT_KEY_PASSWORD: ${{ secrets.MIBOT_KEY_PASSWORD }}
-        run: ./gradlew --no-daemon :app:assembleDebug -Dorg.gradle.jvmargs="-Xmx4g -Dfile.encoding=UTF-8"
+        run: |
+          set +e
+          ./gradlew --no-daemon :app:assembleDebug -Dorg.gradle.jvmargs="-Xmx4g -Dfile.encoding=UTF-8" 2>&1 | tee /tmp/build.log
+          rc=${PIPESTATUS[0]}
+          if [ "$rc" -ne 0 ]; then
+            echo "### Compiler errors" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            grep -E '^e: |error:' /tmp/build.log | head -40 >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          exit "$rc"
 
       - name: Collect APK
         run: |
