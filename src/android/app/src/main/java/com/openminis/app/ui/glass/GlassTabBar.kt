@@ -24,18 +24,18 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.ChatBubble
 import androidx.compose.material.icons.filled.DynamicFeed
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Groups
-import androidx.compose.material.icons.filled.Hub
+import androidx.compose.material.icons.outlined.Bolt
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material.icons.outlined.DynamicFeed
 import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Groups
-import androidx.compose.material.icons.outlined.Hub
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -73,7 +73,7 @@ enum class GlassTab(val labelRes: Int, val icon: ImageVector, val selectedIcon: 
     // [fork/magpie-tab] The Ideas slot is now the Magpie gateway page. The
     // IDEAS enum value stays (its route/page still exist) but leaves the bar.
     IDEAS(R.string.glass_tab_ideas, Icons.Outlined.Lightbulb, Icons.Filled.Lightbulb),
-    MAGPIE(R.string.glass_tab_magpie, Icons.Outlined.Hub, Icons.Filled.Hub),
+    MAGPIE(R.string.glass_tab_magpie, Icons.Outlined.Bolt, Icons.Filled.Bolt),
     // [fork/mibot-ui-tabs] Bots moved to Settings; this slot is 群聊 now.
     GROUPS(R.string.glass_tab_groups, Icons.Outlined.Groups, Icons.Filled.Groups),
     // [fork/settings-sidebar] Settings lives at the sidebar bottom now; the
