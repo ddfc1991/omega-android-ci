@@ -189,13 +189,12 @@ fun GlassSidebar(
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(12.dp))
                     .clickable(onClick = onOpenSettings)
-                    .semantics { contentDescription = settingsLabel }
                     .padding(horizontal = 12.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     Icons.Outlined.Settings,
-                    contentDescription = null,
+                    contentDescription = settingsLabel,
                     tint = fgMuted.copy(alpha = 0.72f),
                     modifier = Modifier.size(MibotIcon.Dense),
                 )
