@@ -14,6 +14,7 @@ import com.openminis.app.R
 import com.openminis.app.data.repository.BackgroundSettingsRepository
 import com.openminis.app.data.repository.ChatRepository
 import com.openminis.app.logging.AppLogger
+import com.openminis.app.mibot.proactive.SessionReadState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -67,9 +68,6 @@ class BackgroundTaskNotifier(
      * notifications or the app is in foreground.
      */
     fun notifyTaskCompleted(sessionId: String, outcome: BackgroundTurnOutcome = BackgroundTurnOutcome.COMPLETED) {
-        if (!backgroundSettings.taskNotificationsEnabled.value) return
-        if (isAppForeground()) return
-
         scope.launch {
             try {
                 val session = chatRepository.getSession(sessionId)
@@ -102,6 +100,15 @@ class BackgroundTaskNotifier(
                     )
                     return@launch
                 }
+                // [fork/proactive-inbox] A finished background/scheduled turn is a
+                // PROACTIVE message — it produced content the user has not seen.
+                // Flag the session unread regardless of the system-notification
+                // toggle or foreground state: the unread dot is the persistent,
+                // passive "Mibot came to you" record, independent of whether a
+                // tray notification is also posted.
+                SessionReadState.markUnread(context, sessionId)
+                if (!backgroundSettings.taskNotificationsEnabled.value) return@launch
+                if (isAppForeground()) return@launch
                 val rawTitle = session?.title?.takeIf { it.isNotBlank() }
                     ?: context.getString(R.string.notif_task_completed_default_title)
                 // [T-bgnotif-outcome] A run that did not finish is not "completed".

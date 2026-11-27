@@ -40,6 +40,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import java.util.Calendar
 import com.openminis.app.mibot.design.Glyph
 import com.openminis.app.mibot.design.LineGlyph
 import com.openminis.app.mibot.design.LineIcons
@@ -123,15 +124,27 @@ fun FeedPage(
         if (entries.isEmpty()) {
             item { FeedEmpty() }
         } else {
-            items(entries, key = { it.id }) { e ->
-                FeedCard(
-                    e = e,
-                    timeLabel = FeedStore.relativeTime(e.ts, now, zh),
-                    onLike = { store.toggleLike(e.id) },
-                    onDiscuss = { onDiscuss(listOf(e.title, e.body).filter { it.isNotBlank() }.joinToString("\n")) },
-                    onDelete = { confirmDelete = e },
-                    onOpen = sourceOpener(e.sourceRef.orEmpty(), onOpenSession, onOpenGroup),
-                )
+            // [fork/feed-timeline] Group the stream under local-calendar day
+            // headers — the vertical timeline's skeleton, with each card's
+            // KindDot as the node on it. Entries arrive newest-first, so a
+            // running "last bucket" comparison is enough.
+            var lastBucket = -1
+            entries.forEach { e ->
+                val bucket = feedDayBucket(e.ts, now)
+                if (bucket != lastBucket) {
+                    item(key = "day:$bucket") { FeedDayHeader(bucket) }
+                    lastBucket = bucket
+                }
+                item(key = e.id) {
+                    FeedCard(
+                        e = e,
+                        timeLabel = FeedStore.relativeTime(e.ts, now, zh),
+                        onLike = { store.toggleLike(e.id) },
+                        onDiscuss = { onDiscuss(listOf(e.title, e.body).filter { it.isNotBlank() }.joinToString("\n")) },
+                        onDelete = { confirmDelete = e },
+                        onOpen = sourceOpener(e.sourceRef.orEmpty(), onOpenSession, onOpenGroup),
+                    )
+                }
             }
         }
     }
@@ -249,6 +262,41 @@ private fun FeedCard(
             ActionPill(LineIcons.Trash2, t("删除", "Delete"), tint, onClick = onDelete)
         }
     }
+}
+
+/** Local-calendar day bucket for [feedDayBucket]: 0=today 1=yesterday 2=week 3=earlier. */
+private fun feedDayBucket(ts: Long, now: Long): Int {
+    val startToday = Calendar.getInstance().apply {
+        timeInMillis = now
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }.timeInMillis
+    val dayMs = 86_400_000L
+    return when {
+        ts >= startToday -> 0
+        ts >= startToday - dayMs -> 1
+        ts >= startToday - 7 * dayMs -> 2
+        else -> 3
+    }
+}
+
+@Composable
+private fun FeedDayHeader(bucket: Int) {
+    val label = when (bucket) {
+        0 -> t("今天", "Today")
+        1 -> t("昨天", "Yesterday")
+        2 -> t("过去 7 天", "Previous 7 days")
+        else -> t("更早", "Earlier")
+    }
+    Text(
+        label,
+        fontSize = MibotType.Secondary,
+        fontWeight = MibotType.Medium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(start = 4.dp, top = 6.dp, bottom = 2.dp),
+    )
 }
 
 @Composable

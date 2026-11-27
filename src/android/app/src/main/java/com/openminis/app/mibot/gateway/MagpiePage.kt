@@ -229,6 +229,7 @@ fun MagpiePage() {
             val ordered = probes.sortedWith(
                 compareBy({ if (it.ok) 0 else 1 }, { if (it.ok) it.ms else Long.MAX_VALUE }),
             )
+            val maxMs = ordered.filter { it.ok && it.ms >= 0 }.maxOfOrNull { it.ms } ?: 0L
             LazyColumn(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 items(ordered, key = { it.id }) { p ->
                     Row(
@@ -250,13 +251,29 @@ fun MagpiePage() {
                             maxLines = 1,
                         )
                         if (p.ok && p.ms >= 0) {
+                            // [fork/ux-latency-bar] Proportional latency bar: a
+                            // glance tells fast from slow, not just the number.
+                            if (maxMs > 0) {
+                                Box(
+                                    Modifier
+                                        .width(44.dp)
+                                        .height(3.dp)
+                                        .clip(RoundedCornerShape(50))
+                                        .background(fgMuted.copy(alpha = 0.15f)),
+                                ) {
+                                    Box(
+                                        Modifier
+                                            .fillMaxWidth((p.ms.toFloat() / maxMs.toFloat()).coerceIn(0.05f, 1f))
+                                            .height(3.dp)
+                                            .clip(RoundedCornerShape(50))
+                                            .background(latencyColor(p.ms, fgMuted)),
+                                    )
+                                }
+                                Spacer(Modifier.width(8.dp))
+                            }
                             Text(
                                 "${p.ms}ms",
-                                color = when {
-                                    p.ms < 1500 -> Color(0xFF4CAF50)
-                                    p.ms < 4000 -> fgMuted
-                                    else -> Color(0xFFE57373)
-                                },
+                                color = latencyColor(p.ms, fgMuted),
                                 fontSize = MibotType.Caption,
                             )
                         }
@@ -265,6 +282,12 @@ fun MagpiePage() {
             }
         }
     }
+}
+
+private fun latencyColor(ms: Long, muted: Color): Color = when {
+    ms < 1500 -> Color(0xFF4CAF50)
+    ms < 4000 -> muted
+    else -> Color(0xFFE57373)
 }
 
 @Composable

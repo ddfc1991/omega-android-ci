@@ -53,6 +53,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -63,6 +64,7 @@ import com.openminis.app.R
 import com.openminis.app.mibot.design.MibotIcon
 import com.openminis.app.mibot.design.MibotType
 import com.openminis.app.mibot.design.t
+import com.openminis.app.mibot.proactive.SessionReadState
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
 
@@ -89,12 +91,16 @@ fun GlassSidebar(
     // [fork/settings-sidebar] Settings entry at the sidebar bottom; default
     // no-op keeps existing previews/callers compiling.
     onOpenSettings: () -> Unit = {},
+    // [fork/proactive-inbox] The session currently on screen, excluded from
+    // unread dots (you are looking at it). Null when the list/home is showing.
+    currentSessionId: String? = null,
     modifier: Modifier = Modifier,
 ) {
     val style = LocalGlassStyle.current
     val dark = style == GlassStyle.DUSK
     val fg = if (dark) GlassPalette.DuskOn else GlassPalette.WarmOn
     val fgMuted = fg.copy(alpha = 0.72f) // [fork/frost] ≥4.5:1 on the sheet
+    val context = LocalContext.current
     // [fork/settings-sidebar] computed outside semantics lambda (t() is @Composable).
     val settingsLabel = t("设置", "Settings")
     var query by rememberSaveable { mutableStateOf("") }
@@ -163,13 +169,13 @@ fun GlassSidebar(
                         }
                         if (showArchived) {
                             items(section.items, key = { it.id }) { item ->
-                                RecentRow(item, fg, fgMuted, dark, onClick = { onOpen(item) }, onDelete = { pendingDelete = item })
+                                RecentRow(item, fg, fgMuted, dark, unread = item is RecentItem.Chat && item.id != currentSessionId && SessionReadState.hasUnread(context, item.id), onClick = { onOpen(item) }, onDelete = { pendingDelete = item })
                             }
                         }
                     } else {
                         item(key = "h:${section.bucket}") { SectionHeader(sectionLabel(section.bucket), fgMuted) }
                         items(section.items, key = { it.id }) { item ->
-                            RecentRow(item, fg, fgMuted, dark, onClick = { onOpen(item) }, onDelete = { pendingDelete = item })
+                            RecentRow(item, fg, fgMuted, dark, unread = item is RecentItem.Chat && item.id != currentSessionId && SessionReadState.hasUnread(context, item.id), onClick = { onOpen(item) }, onDelete = { pendingDelete = item })
                         }
                     }
                 }
@@ -339,6 +345,7 @@ private fun RecentRow(
     fg: Color,
     fgMuted: Color,
     dark: Boolean,
+    unread: Boolean,
     onClick: () -> Unit,
     onDelete: () -> Unit,
 ) {
@@ -350,6 +357,27 @@ private fun RecentRow(
             .padding(start = 12.dp, end = 2.dp, top = 2.dp, bottom = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        // [fork/proactive-inbox] Leading identity avatar for plain chats (group
+        // rows already carry member avatars on the trailing edge).
+        if (item is RecentItem.Chat) {
+            val title = item.title ?: stringResource(R.string.glass_untitled)
+            Box(
+                Modifier
+                    .size(28.dp)
+                    .clip(CircleShape)
+                    .background(AvatarColors[(title.hashCode() and 0x7fffffff) % AvatarColors.size]),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    title.trim().firstOrNull()?.toString() ?: "?",
+                    color = Color.White,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                )
+            }
+            Spacer(Modifier.width(10.dp))
+        }
         Text(
             item.title ?: stringResource(R.string.glass_untitled),
             color = fg,
@@ -360,6 +388,17 @@ private fun RecentRow(
                 .weight(1f)
                 .padding(vertical = 12.dp),
         )
+        // [fork/proactive-inbox] Proactive-unread dot: a background/scheduled
+        // agent delivered content the user has not opened yet.
+        if (unread) {
+            Box(
+                Modifier
+                    .size(7.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFFD9541E)),
+            )
+            Spacer(Modifier.width(6.dp))
+        }
         if (item is RecentItem.Group) {
             Spacer(Modifier.width(8.dp))
             GroupBadge(fgMuted, dark)

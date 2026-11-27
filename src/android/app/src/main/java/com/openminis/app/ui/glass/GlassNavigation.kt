@@ -188,6 +188,7 @@ fun GlassDrawerHost(
                     scope.launch { drawerState.close() }
                     navController.safeNavigate(Routes.SETTINGS)
                 },
+                currentSessionId = navController.currentBackStackEntry?.arguments?.getString("sessionId"),
                 onDelete = { item ->
                     if (!item.id.startsWith("demo-")) {
                         when (item) {

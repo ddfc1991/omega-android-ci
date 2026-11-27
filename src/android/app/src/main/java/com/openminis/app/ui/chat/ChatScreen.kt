@@ -1190,6 +1190,15 @@ fun ChatScreen(
     // App-icon quick action: when the user launched via
     // `minis://action/camera_chat`, auto-open the camera on first compose.
     // Consumed exactly once so re-entering the chat later does NOT re-trigger.
+    // [fork/proactive-inbox] Looking at a session clears its proactive-unread
+    // dot — on open and on leave, so a turn the user watched finish does not
+    // linger as unread.
+    androidx.compose.runtime.DisposableEffect(sessionId) {
+        com.openminis.app.mibot.proactive.SessionReadState.markRead(context, sessionId)
+        onDispose {
+            com.openminis.app.mibot.proactive.SessionReadState.markRead(context, sessionId)
+        }
+    }
     // Voice variant lives next to the MicButton because it needs sttAvailable
     // — camera is always available so it can fire from the top-level scope.
     LaunchedEffect(sessionId) {
