@@ -241,6 +241,8 @@ private fun MagpieButton(label: String, accent: Color, fg: Color, enabled: Boole
     }
 }
 
+@androidx.compose.runtime.Composable
+@androidx.compose.runtime.ReadOnlyComposable
 private fun ago(then: Long): String {
     val s = (System.currentTimeMillis() - then) / 1000
     return when {

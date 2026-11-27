@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import com.openminis.app.data.repository.ChatRepository
 import com.openminis.app.ui.navigation.Routes
+import com.openminis.app.ui.navigation.safeNavigate
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.coroutines.launch
