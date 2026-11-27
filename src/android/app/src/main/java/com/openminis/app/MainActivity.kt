@@ -680,10 +680,19 @@ class MainActivity : ComponentActivity() {
                 // a floating banner over every screen (iOS ContentView).
                 com.openminis.app.ui.settings.NetworkAlertBannerHost(navController)
 
-                // [fork/mibot-v3] Small live view of the hidden display while the agent works.
-                com.openminis.app.mibot.phone.VdMiniView(onOpen = {
-                    navController.navigate(com.openminis.app.mibot.phone.VdRoutes.PAGE) { launchSingleTop = true }
-                })
+                // [fork/mika-desk] Draggable PiP of the hidden display.
+                com.openminis.app.mibot.desk.VdDraggablePip(
+                    onOpen = {
+                        navController.navigate(com.openminis.app.mibot.phone.VdRoutes.PAGE) { launchSingleTop = true }
+                    },
+                    onDock = {
+                        com.openminis.app.service.ToolOverlayController.show(
+                            toolName = "virtual-screen",
+                            statusText = "后台虚拟屏已停靠到流云体",
+                            isRunning = true,
+                        )
+                    },
+                )
 
                 // [fork/mibot-autokey-v2] The AutoKey connect sheet + its WebView, hosted at the root so
                 // a run keeps its page when the user leaves 自动发现并连接 (it used to be destroyed there).
