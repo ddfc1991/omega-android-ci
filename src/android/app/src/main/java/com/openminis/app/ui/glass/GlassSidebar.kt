@@ -30,6 +30,7 @@ import androidx.compose.material.icons.outlined.EditNote
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -83,6 +84,9 @@ fun GlassSidebar(
     onOpen: (RecentItem) -> Unit,
     onNewChat: () -> Unit,
     onDelete: (RecentItem) -> Unit,
+    // [fork/settings-sidebar] Settings entry at the sidebar bottom; default
+    // no-op keeps existing previews/callers compiling.
+    onOpenSettings: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val style = LocalGlassStyle.current
@@ -165,6 +169,37 @@ fun GlassSidebar(
                         }
                     }
                 }
+            }
+
+            // [fork/settings-sidebar] Settings pinned to the sidebar bottom,
+            // hairline-separated from the list above.
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 6.dp)
+                    .height(1.dp)
+                    .background(GlassStyles.hairline(style)),
+            )
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable(onClick = onOpenSettings)
+                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    Icons.Outlined.Settings,
+                    contentDescription = null,
+                    tint = fgMuted.copy(alpha = 0.72f),
+                    modifier = Modifier.size(MibotIcon.Dense),
+                )
+                Spacer(Modifier.width(10.dp))
+                Text(
+                    t("设置", "Settings"),
+                    color = fgMuted,
+                    fontSize = MibotType.Body,
+                )
             }
         }
 

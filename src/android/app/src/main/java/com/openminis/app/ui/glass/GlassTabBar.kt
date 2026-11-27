@@ -68,10 +68,20 @@ import dev.chrisbanes.haze.rememberHazeState
 enum class GlassTab(val labelRes: Int, val icon: ImageVector, val selectedIcon: ImageVector) {
     CHATS(R.string.glass_tab_chats, Icons.Outlined.ChatBubbleOutline, Icons.Filled.ChatBubble),
     FEED(R.string.glass_tab_feed, Icons.Outlined.DynamicFeed, Icons.Filled.DynamicFeed),
+    // [fork/magpie-tab] The Ideas slot is now the Magpie gateway page. The
+    // IDEAS enum value stays (its route/page still exist) but leaves the bar.
     IDEAS(R.string.glass_tab_ideas, Icons.Outlined.Lightbulb, Icons.Filled.Lightbulb),
+    MAGPIE(R.string.glass_tab_magpie, Icons.Outlined.Lan, Icons.Filled.Lan),
     // [fork/mibot-ui-tabs] Bots moved to Settings; this slot is 群聊 now.
     GROUPS(R.string.glass_tab_groups, Icons.Outlined.Groups, Icons.Filled.Groups),
+    // [fork/settings-sidebar] Settings lives at the sidebar bottom now; the
+    // enum value stays because the route + tab shell still reference it.
     SETTINGS(R.string.glass_tab_settings, Icons.Outlined.Settings, Icons.Filled.Settings),
+    ;
+
+    /** Tabs that appear in the bottom capsule, in enum order. */
+    val inBar: Boolean
+        get() = this != IDEAS && this != SETTINGS
 }
 
 /** [fork/mibot-v4] Floating capsule height and its gap to the screen bottom. */
@@ -213,6 +223,7 @@ private fun GlassTab.glyph(): com.openminis.app.mibot.design.LineGlyph = with(co
         GlassTab.CHATS -> MessageCircle
         GlassTab.FEED -> Newspaper
         GlassTab.IDEAS -> Lightbulb
+        GlassTab.MAGPIE -> Waypoints
         GlassTab.GROUPS -> Users
         GlassTab.SETTINGS -> Settings
     }
@@ -258,7 +269,7 @@ private fun GlassTabBar(
                 .border(1.dp, rim, shape),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            GlassTab.entries.forEach { tab ->
+            GlassTab.entries.filter { it.inBar }.forEach { tab ->
                 val selected = tab == current
                 val label = stringResource(tab.labelRes)
                 val color by animateColorAsState(if (selected) selectedColor else idleColor, label = "tabColor")

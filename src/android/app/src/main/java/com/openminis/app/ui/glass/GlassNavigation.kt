@@ -25,6 +25,8 @@ import kotlinx.coroutines.launch
 object GlassRoutes {
     const val FEED = "glass_feed"
     const val IDEAS = "glass_ideas"
+    /** [fork/magpie-tab] Bottom tab: the Magpie local-gateway page. */
+    const val MAGPIE = "glass_magpie"
     /** [fork/mibot-ui-tabs] Settings › Bots (no longer a bottom tab). */
     const val BOTS = "glass_bots"
     /** [fork/mibot-ui-tabs] Bottom tab 群聊. */
@@ -93,6 +95,7 @@ fun NavHostController.navigateToGlassTab(tab: GlassTab) {
         GlassTab.CHATS -> Routes.SESSION_LIST
         GlassTab.FEED -> GlassRoutes.FEED
         GlassTab.IDEAS -> GlassRoutes.IDEAS
+        GlassTab.MAGPIE -> GlassRoutes.MAGPIE
         GlassTab.GROUPS -> GlassRoutes.GROUPS
         GlassTab.SETTINGS -> Routes.SETTINGS
     }
@@ -179,6 +182,10 @@ fun GlassDrawerHost(
                     navController.navigate(Routes.chat("__new__${java.util.UUID.randomUUID()}")) {
                         popUpTo(Routes.SESSION_LIST) { inclusive = false }
                     }
+                },
+                onOpenSettings = {
+                    scope.launch { drawerState.close() }
+                    navController.safeNavigate(Routes.SETTINGS)
                 },
                 onDelete = { item ->
                     if (!item.id.startsWith("demo-")) {

@@ -377,6 +377,15 @@ class MinisApp : Application(), ImageLoaderFactory {
                 Log.w("MinisApp", "startup rescheduleAll failed: ${it.message}")
             }
         }
+        // [fork/magpie-gateway] Daily Magpie model refresh + latency probe.
+        // Stale-snapshot gate inside; a no-op when the gateway isn't up.
+        providerRepositoryOrNull?.let { repo ->
+            com.openminis.app.mibot.gateway.MagpieHealth.maybeAutoRefresh(
+                this@MinisApp,
+                repo,
+                kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.Default),
+            )
+        }
 
         // T-android-fgs-timeout-crash: chain an UncaughtExceptionHandler
         // ahead of ACRA's so we can intercept

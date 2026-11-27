@@ -35,6 +35,7 @@
     <string name="glass_bug_chooser">发送问题反馈</string>
     <string name="glass_bug_body_hint">请描述发生了什么：</string>
     <string name="glass_tab_ideas">点子</string>
+    <string name="glass_tab_magpie">Magpie</string>
     <string name="glass_tab_settings">设置</string>
     <string name="glass_ideas_desc">记录点子，在画布上展开。</string>
     <string name="glass_section_feedback">反馈</string>

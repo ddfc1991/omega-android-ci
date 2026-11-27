@@ -551,8 +551,12 @@ fun rememberModelEntryPickerSections(
     systemProviderLabel: String = "System",
 ): ModelSearch.Result<ProviderInstance> {
     val query = rememberDebouncedQuery(searchQuery)
-    return androidx.compose.runtime.remember(instances, availableEntries, query, modalityFilter, excludeIds, systemProviderLabel) {
-        modelEntryPickerSearch(instances, availableEntries, query, modalityFilter, excludeIds, systemProviderLabel)
+    // [fork/magpie-gateway] Read the health snapshot once here (composable
+    // context) so the pure search below stays a pure function of its inputs.
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val magpieSnapshot = com.openminis.app.mibot.gateway.MagpieHealth.snapshot(context)
+    return androidx.compose.runtime.remember(instances, availableEntries, query, modalityFilter, excludeIds, systemProviderLabel, magpieSnapshot) {
+        modelEntryPickerSearch(instances, availableEntries, query, modalityFilter, excludeIds, systemProviderLabel, magpieSnapshot)
     }
 }
 
@@ -569,6 +573,7 @@ internal fun modelEntryPickerSearch(
     modalityFilter: PickerModalityFilter?,
     excludeIds: Set<String>,
     systemProviderLabel: String,
+    magpieSnapshot: com.openminis.app.mibot.gateway.MagpieHealth.Snapshot? = null,
 ): ModelSearch.Result<ProviderInstance> {
     // System section leads when a modality filter is active (iOS: the System
     // synthetic instance is first in entriesByInstance).
@@ -598,7 +603,14 @@ internal fun modelEntryPickerSearch(
             // to the comparator's final key, display name, which is a stable
             // and readable order for a voice list — not a regression.
             val entries = byInstance[instance.id] ?: return@mapNotNull null
-            instance to com.openminis.app.data.repository.ModelEntryRanking.sortedByReleaseRank(entries)
+            // [fork/magpie-gateway] The Magpie section orders by probe health
+            // (alive first, fastest first, dead last) once a daily check has
+            // run; before the first probe the release rank is all we have.
+            val sorted = if (com.openminis.app.mibot.gateway.MagpieHealth.isMagpie(instance) && magpieSnapshot?.hasData == true)
+                com.openminis.app.mibot.gateway.MagpieHealth.sortEntries(magpieSnapshot, entries)
+            else
+                com.openminis.app.data.repository.ModelEntryRanking.sortedByReleaseRank(entries)
+            instance to sorted
         }
     // Ties in relevance keep this newest-first order (ModelSearch.rank is stable).
     return ModelSearch.search(base, { it.label.ifEmpty { it.providerType.displayName } }, query)

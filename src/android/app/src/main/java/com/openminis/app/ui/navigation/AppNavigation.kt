@@ -687,6 +687,16 @@ fun AppNavigation(
                 )
             }
         }
+        // [fork/magpie-tab] Bottom tab: the Magpie local-gateway page.
+        composable(com.openminis.app.ui.glass.GlassRoutes.MAGPIE) {
+            com.openminis.app.ui.glass.GlassTabShell(
+                current = com.openminis.app.ui.glass.GlassTab.MAGPIE,
+                onSelect = { navController.navigateToGlassTab(it) },
+                scrollUnder = true,
+            ) {
+                com.openminis.app.mibot.gateway.MagpiePage()
+            }
+        }
         // [fork/mibot-ui-tabs] Bottom tab 群聊 (was Bots).
         composable(com.openminis.app.ui.glass.GlassRoutes.GROUPS) {
             com.openminis.app.ui.glass.GlassTabShell(
