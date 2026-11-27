@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -22,6 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.isImeVisible
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bolt
@@ -39,6 +41,7 @@ import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import com.openminis.app.mibot.design.LineIcons
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
@@ -47,6 +50,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -261,58 +265,105 @@ private fun GlassTabBar(
             .windowInsetsPadding(WindowInsets.navigationBars)
             .padding(start = 12.dp, end = 12.dp, bottom = GlassTabBarMargin),
     ) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .height(GlassTabBarCapsule)
-                // [fork/frost] Shared frosted surface: blur of the page beneath,
-                // 0.62/0.72 scrim (0.88 flat below API 31), rim + soft shadow.
-                .frosted(shape, FrostLevel.Bar, border = false, elevation = 8.dp, haze = haze)
-                .border(1.dp, rim, shape),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            GlassTab.entries.filter { it.inBar }.forEach { tab ->
-                val selected = tab == current
-                val label = stringResource(tab.labelRes)
-                val color by animateColorAsState(if (selected) selectedColor else idleColor, label = "tabColor")
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            // [fork/nav-grouped] Left capsule: the 4 primary tabs, each weight 1.
+            Row(
+                Modifier
+                    .weight(1f)
+                    .height(GlassTabBarCapsule)
+                    .frosted(shape, FrostLevel.Bar, border = false, elevation = 8.dp, haze = haze)
+                    .border(1.dp, rim, shape),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                GlassTab.entries.filter { it.inBar }.forEach { tab ->
+                    val selected = tab == current
+                    val label = stringResource(tab.labelRes)
+                    val color by animateColorAsState(if (selected) selectedColor else idleColor, label = "tabColor-$label")
+                    Column(
+                        Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                role = Role.Tab,
+                            ) { onSelect(tab) }
+                            .semantics { this.selected = selected; contentDescription = label },
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                    ) {
+                        Box(
+                            Modifier
+                                .size(width = 48.dp, height = 28.dp)
+                                .clip(RoundedCornerShape(14.dp))
+                                .background(if (selected) selectedColor.copy(alpha = if (dark) 0.20f else 0.12f) else Color.Transparent),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            com.openminis.app.mibot.design.Glyph(
+                                tab.glyph(), size = 22.dp, tint = color, duotone = selected,
+                            )
+                        }
+                        Text(
+                            label, fontSize = 11.sp, lineHeight = 13.sp, maxLines = 1,
+                            color = color, fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+                        )
+                    }
+                }
+            }
+            Spacer(Modifier.width(8.dp))
+            // [fork/nav-grouped] Right capsule: background display + avatar.
+            // Their states are independent of the selected tab (badge/ring rules).
+            Row(
+                Modifier
+                    .height(GlassTabBarCapsule)
+                    .frosted(shape, FrostLevel.Bar, border = false, elevation = 8.dp, haze = haze)
+                    .border(1.dp, rim, shape),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                val ctx = LocalContext.current
+                fun openDeepLink(path: String) {
+                    runCatching {
+                        ctx.startActivity(
+                            android.content.Intent(
+                                android.content.Intent.ACTION_VIEW,
+                                android.net.Uri.parse("minis://settings/$path"),
+                            ).setPackage(ctx.packageName).addFlags(android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP),
+                        )
+                    }
+                }
                 Column(
                     Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            role = Role.Tab,
-                        ) { onSelect(tab) }
-                        .semantics {
-                            this.selected = selected
-                            contentDescription = label
-                        },
+                        .size(width = 52.dp, height = GlassTabBarCapsule)
+                        .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, role = Role.Button) {
+                            openDeepLink("virtual-display")
+                        }
+                        .semantics { contentDescription = "后台虚拟屏" },
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                 ) {
-                    Box(
-                        Modifier
-                            .size(width = 48.dp, height = 28.dp)
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(if (selected) selectedColor.copy(alpha = if (dark) 0.20f else 0.12f) else Color.Transparent),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        com.openminis.app.mibot.design.Glyph(
-                            tab.glyph(),
-                            size = 22.dp,
-                            tint = color,
-                            duotone = selected,
-                        )
-                    }
-                    Text(
-                        label,
-                        fontSize = 11.sp,
-                        lineHeight = 13.sp,
-                        maxLines = 1,
-                        color = color,
-                        fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+                    com.openminis.app.mibot.design.Glyph(
+                        com.openminis.app.mibot.design.LineIcons.MonitorSmartphone,
+                        size = 22.dp, tint = idleColor,
                     )
+                    Text("后台", fontSize = 11.sp, lineHeight = 13.sp, color = idleColor)
+                }
+                Box(
+                    Modifier
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .background(
+                            androidx.compose.ui.graphics.Brush.linearGradient(
+                                listOf(Color(0xFFE8846B), Color(0xFF6E8AA3)),
+                            ),
+                        )
+                        .border(1.5.dp, selectedColor.copy(alpha = 0.6f), CircleShape)
+                        .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, role = Role.Button) {
+                            openDeepLink("")
+                        }
+                        .semantics { contentDescription = "设置" },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text("M", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }
