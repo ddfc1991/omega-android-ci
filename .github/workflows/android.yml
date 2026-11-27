@@ -142,7 +142,8 @@ jobs:
           if [ "$rc" -ne 0 ]; then
             echo "### Compiler errors" >> "$GITHUB_STEP_SUMMARY"
             echo '```' >> "$GITHUB_STEP_SUMMARY"
-            grep -E '^e: |error:' /tmp/build.log | head -40 >> "$GITHUB_STEP_SUMMARY"
+            grep -E 'e: |error:|Compilation|BUILD FAILED' /tmp/build.log | tail -40 >> "$GITHUB_STEP_SUMMARY"
+            tail -30 /tmp/build.log >> "$GITHUB_STEP_SUMMARY"
             echo '```' >> "$GITHUB_STEP_SUMMARY"
           fi
           exit "$rc"
