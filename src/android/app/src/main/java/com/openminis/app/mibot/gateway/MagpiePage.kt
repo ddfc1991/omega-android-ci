@@ -141,7 +141,10 @@ fun MagpiePage() {
             val alive = snap?.probes?.values?.count { it.ok } ?: 0
             val total = snap?.probes?.size ?: 0
             val summary = t("${alive} 个模型可用 / 共 ${total} 个", "$alive alive / $total models")
-            val checked = snap?.lastCheck?.takeIf { it > 0 }?.let { " · " + t("体检于 ", "checked ") + ago(it) }.orEmpty()
+            val lastCheck = snap?.lastCheck ?: 0L
+            val checkedPrefix = t("体检于 ", "checked ")
+            val agoText = if (lastCheck > 0) ago(lastCheck) else ""
+            val checked = if (lastCheck > 0) " · " + checkedPrefix + agoText else ""
             Text(
                 summary + checked,
                 color = fgMuted,
