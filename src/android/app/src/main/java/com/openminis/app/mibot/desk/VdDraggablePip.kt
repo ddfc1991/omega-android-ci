@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,7 +36,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.toDp
 import com.openminis.app.mibot.design.MibotTokens
 import com.openminis.app.mibot.phone.VdController
 import kotlin.math.roundToInt
@@ -51,6 +51,7 @@ fun VdDraggablePip(onOpen: () -> Unit, onDock: () -> Unit, modifier: Modifier = 
     val frame by source.collectAsState()
 
     val density = LocalDensity.current
+    val scope = rememberCoroutineScope()
     val pipW = with(density) { 116.dp.toPx() }
     val aspect = if (vd.height > 0) vd.width.toFloat() / vd.height.toFloat() else 1.8f
     val pipH = pipW / aspect.coerceIn(0.5f, 3f)
@@ -94,8 +95,8 @@ fun VdDraggablePip(onOpen: () -> Unit, onDock: () -> Unit, modifier: Modifier = 
             Modifier
                 .offset { IntOffset(xAnim.value.roundToInt(), yAnim.value.roundToInt()) }
                 .size(
-                    width = with(density) { pipW.toInt().toDp() },
-                    height = with(density) { pipH.toInt().toDp() },
+                    width = (pipW / density.density).dp,
+                    height = (pipH / density.density).dp,
                 )
                 .clip(PipShape)
                 .background(Color.Black)
@@ -105,8 +106,10 @@ fun VdDraggablePip(onOpen: () -> Unit, onDock: () -> Unit, modifier: Modifier = 
                         onDragStart = { },
                         onDrag = { change, amount ->
                             change.consume()
-                            xAnim.snapTo(xAnim.value + amount.x)
-                            yAnim.snapTo(yAnim.value + amount.y)
+                            scope.launch {
+                                xAnim.snapTo(xAnim.value + amount.x)
+                                yAnim.snapTo(yAnim.value + amount.y)
+                            }
                         },
                         onDragEnd = {
                             val b = PipPhysics.Bounds(
@@ -121,6 +124,8 @@ fun VdDraggablePip(onOpen: () -> Unit, onDock: () -> Unit, modifier: Modifier = 
                                     kotlin.math.abs(px - hostW / 2f) < hostW * 0.28f
                                 ) onDock()
                                 corner = PipPhysics.snapCorner(xAnim.value, yAnim.value, 0f, 0f, b)
+                                // LaunchedEffect re-springs to the new corner; no
+                                // suspend call needed here.
                             }
                         },
                     )

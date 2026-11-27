@@ -686,11 +686,12 @@ class MainActivity : ComponentActivity() {
                         navController.navigate(com.openminis.app.mibot.phone.VdRoutes.PAGE) { launchSingleTop = true }
                     },
                     onDock = {
-                        com.openminis.app.service.ToolOverlayController.show(
-                            toolName = "virtual-screen",
-                            statusText = "后台虚拟屏已停靠到流云体",
-                            isRunning = true,
-                        )
+                        com.openminis.app.service.ToolOverlayController(this@MainActivity)
+                            .show(
+                                toolName = "virtual-screen",
+                                statusText = "后台虚拟屏已停靠到流云体",
+                                isRunning = true,
+                            )
                     },
                 )
 
