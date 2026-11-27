@@ -136,17 +136,14 @@ fun MagpiePage() {
                 )
             }
             Spacer(Modifier.height(10.dp))
+            // [fork/magpie-gateway] t()/ago() are @Composable: call them in the
+            // composable scope, never inside buildString's plain lambda.
+            val alive = snap?.probes?.values?.count { it.ok } ?: 0
+            val total = snap?.probes?.size ?: 0
+            val summary = t("${alive} 个模型可用 / 共 ${total} 个", "$alive alive / $total models")
+            val checked = snap?.lastCheck?.takeIf { it > 0 }?.let { " · " + t("体检于 ", "checked ") + ago(it) }.orEmpty()
             Text(
-                buildString {
-                    val alive = snap?.probes?.values?.count { it.ok } ?: 0
-                    val total = snap?.probes?.size ?: 0
-                    append(t("${alive} 个模型可用 / 共 ${total} 个", "$alive alive / $total models"))
-                    snap?.lastCheck?.takeIf { it > 0 }?.let {
-                        append(" · ")
-                        append(t("体检于 ", "checked "))
-                        append(ago(it))
-                    }
-                },
+                summary + checked,
                 color = fgMuted,
                 fontSize = MibotType.Caption,
             )
