@@ -37,7 +37,10 @@ android {
         // Minis (com.openminis.app). `namespace` stays com.openminis.app, so R /
         // BuildConfig / class names are unchanged; anything that needs the
         // installed package must use context.packageName or BuildConfig.APPLICATION_ID.
-        applicationId = "com.dl1991.mibot"
+        // [fork/muse] Muse UI line: separate applicationId so the Muse redesign
+        // installs alongside the sidebar builds (com.dl1991.mibot) without
+        // overwriting them.
+        applicationId = "com.dl1991.muse"
         minSdk = 26
         targetSdk = 35
         versionCode = 45
