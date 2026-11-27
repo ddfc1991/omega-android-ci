@@ -39,8 +39,10 @@ for t in Feed:03-feed Magpie:04-magpie "Group chats":05-groups; do
   name="${t%%:*}"; file="${t##*:}"
   if tap desc "$name"; then shot "$file" 3; else echo "::warning::tab $name not found"; fail=1; fi
 done
-# Settings now lives in the sidebar: open it, tap the pinned Settings row.
-tap desc "Open sidebar" >/dev/null 2>&1 || true; sleep 1
+# Settings now lives in the sidebar: return to Chats first (the open-sidebar
+# button only exists on the chats tab), then tap the pinned Settings row.
+tap desc "Chats" >/dev/null 2>&1 || true; sleep 1
+tap desc "Open sidebar" >/dev/null 2>&1 || tap text "对话" >/dev/null 2>&1 || true; sleep 1
 if tap text "Settings" || tap desc "Settings"; then shot 06-settings 3; else echo "::warning::sidebar Settings row not found"; fail=1; fi
 adb shell input keyevent KEYCODE_BACK; sleep 1
 # Settings page scrolled to the Appearance / Feedback rows.
