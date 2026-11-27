@@ -41,7 +41,8 @@ for t in Feed:03-feed Magpie:04-magpie "Group chats":05-groups; do
 done
 # Settings now lives in the sidebar: open it, tap the pinned Settings row.
 tap desc "Open sidebar" >/dev/null 2>&1 || true; sleep 1
-if tap desc "Settings"; then shot 06-settings 3; else echo "::warning::sidebar Settings row not found"; fail=1; fi
+if tap text "Settings" || tap desc "Settings"; then shot 06-settings 3; else echo "::warning::sidebar Settings row not found"; fail=1; fi
+adb shell input keyevent KEYCODE_BACK; sleep 1
 # Settings page scrolled to the Appearance / Feedback rows.
 adb shell input swipe 540 1700 540 900 400; shot 07-settings-scrolled 2
 
@@ -87,7 +88,7 @@ for th in 1:light 2:dark; do
   if tap desc "打开侧边栏"; then
     zshot "$n-03-sidebar" 3
     # [fork/settings-sidebar] Settings is the pinned bottom row, not a tab.
-    if tap desc "设置"; then zshot "$n-05-settings" 3; else echo "::warning::zh sidebar 设置 not found ($n)"; fi
+    if tap text "设置" || tap desc "设置"; then zshot "$n-05-settings" 3; else echo "::warning::zh sidebar 设置 not found ($n)"; fi
     tap desc "对话" >/dev/null 2>&1 || true; sleep 1
     if tap desc "打开侧边栏"; then
       if tap desc "新对话"; then zshot "$n-02-chat" 3; adb shell input keyevent KEYCODE_BACK; sleep 1; else echo "::warning::zh new-chat not found ($n)"; fi
