@@ -16561,6 +16561,10 @@ Scheduled tasks: crontab / at / nohup loops will stop when the app is suspended,
 
         return buildString {
             append(base)
+            // [fork/forge-persona] Always-on operating stanza. Static text, so it
+            // extends the cache-friendly prefix without breaking it; sits right
+            // after `base` so it overrides any softer SOUL.md wording above.
+            append(com.openminis.app.mibot.proactive.ForgePersona.SECTION)
             if (skillFragment != null) {
                 append("\n\n")
                 append(skillFragment)
