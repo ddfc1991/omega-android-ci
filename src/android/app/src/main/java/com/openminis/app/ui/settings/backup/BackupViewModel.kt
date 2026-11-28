@@ -417,6 +417,31 @@ class BackupViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /**
+     * [fork/backup-discovery] Open a package that already lives on disk —
+     * the entry [BackupRecoveryScanner] feeds from the restore screen.
+     * Skips the SAF copy [loadPackage] has to do, since the file is a real
+     * path we can read directly.
+     */
+    fun loadPackageFromFile(file: File) {
+        _isRunning.value = true
+        _statusText.value = getApplication<android.app.Application>().getString(com.openminis.app.R.string.restore_progress_reading)
+        _report.value = null
+        viewModelScope.launch {
+            try {
+                val pending = withContext(Dispatchers.IO) { extractAndInspect(file) }
+                setPending(pending)
+                _statusText.value = null
+            } catch (e: Exception) {
+                AppLogger.error(TAG, "[Restore] load from file failed: ${e.message}")
+                _errorText.value = e.message ?: "This file could not be read as a backup."
+                _statusText.value = null
+            } finally {
+                _isRunning.value = false
+            }
+        }
+    }
+
     /** Shared extract+manifest-read core, off the main thread. */
     private fun extractAndInspect(zip: File): PendingRestore {
         val extracted = File(getApplication<Application>().cacheDir, "restore-extract")

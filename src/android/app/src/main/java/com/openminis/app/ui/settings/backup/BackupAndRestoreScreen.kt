@@ -73,6 +73,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.openminis.app.backup.BackupRecoveryScanner
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -1016,6 +1017,27 @@ private fun RestoreTab(
     val pickLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument(),
     ) { uri -> if (uri != null) vm.loadPackage(uri) }
+
+    // [fork/backup-discovery] Show locally found backup packages
+    val scanner = remember { BackupRecoveryScanner(context) }
+    val found by scanner.foundPackages.collectAsState()
+    LaunchedEffect(Unit) { scanner.scan() }
+    if (found.isNotEmpty()) {
+        SettingsSection(
+            header = stringResource(R.string.backup_found_local_packages),
+            footer = stringResource(R.string.backup_found_local_packages_footer),
+        ) {
+            found.forEach { pkg ->
+                RestorePackageRow(
+                    packageName = pkg.name,
+                    deviceName = pkg.manifest.deviceName,
+                    categories = pkg.manifest.categories,
+                    sizeMb = pkg.sizeMb,
+                    onClick = { vm.loadPackageFromFile(pkg.file) },
+                )
+            }
+        }
+    }
 
     // Report replaces everything once a restore finishes.
     if (report != null) {
@@ -2121,3 +2143,40 @@ private fun reportNoticeColor(): Color =
     } else {
         Color(0xFFB45309)
     }
+
+/**
+ * [fork/backup-discovery] Row for a locally discovered backup package.
+ */
+@Composable
+private fun RestorePackageRow(
+    packageName: String,
+    deviceName: String,
+    categories: Map<String, BackupFormat.CategoryStat>,
+    sizeMb: Long,
+    onClick: () -> Unit,
+) {
+    val icon = Icons.Filled.CloudQueue
+    val text = "$packageName · $deviceName · ${sizeMb} MB"
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(18.dp),
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
